@@ -2,7 +2,7 @@
   "name": "enterprise-banking-dashboard",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://abiddasurkar.github.io/enterprise-banking-dashboard/",
+  "homepage": "https://abiddasurkar.github.io/banking-dashboard",
   "dependencies": {
     "framer-motion": "^10.16.4",
     "react": "^18.2.0",
