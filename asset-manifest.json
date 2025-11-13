@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/banking-dashboard/static/css/main.055ac913.css",
+    "main.js": "/banking-dashboard/static/js/main.a7594aa4.js",
+    "index.html": "/banking-dashboard/index.html",
+    "main.055ac913.css.map": "/banking-dashboard/static/css/main.055ac913.css.map",
+    "main.a7594aa4.js.map": "/banking-dashboard/static/js/main.a7594aa4.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.055ac913.css",
+    "static/js/main.a7594aa4.js"
+  ]
+}
