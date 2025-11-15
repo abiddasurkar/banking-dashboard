@@ -11,10 +11,11 @@ const Sidebar = ({
 }) => {
   return (
     <>
+      {/* Mobile Overlay */}
       <AnimatePresence>
         {isMobile && isOpen && (
           <motion.div
-            className="fixed inset-0 bg-black/50 z-30"
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -23,15 +24,26 @@ const Sidebar = ({
         )}
       </AnimatePresence>
 
+      {/* Sidebar Container */}
       <motion.aside
-        className="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 lg:static h-full flex flex-col"
-        animate={{ x: isMobile ? (isOpen ? 0 : -260) : 0 }}
+        className="h-full w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col"
+        animate={{
+          x: isMobile ? (isOpen ? 0 : -260) : 0,
+          position: isMobile ? "fixed" : "static",
+        }}
         transition={{ duration: 0.3 }}
+        style={{
+          zIndex: isMobile ? 40 : "auto",
+          left: isMobile ? 0 : "auto",
+          top: isMobile ? "3.5rem" : "auto", // Height of navbar
+          bottom: isMobile ? 0 : "auto",
+        }}
       >
-        <div className="px-6 py-8 flex items-center justify-between lg:hidden border-b border-gray-200 dark:border-slate-800">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-            EB
-          </div>
+        {/* Mobile Close Button */}
+        <div className="px-6 py-4 flex items-center justify-between lg:hidden border-b border-gray-200 dark:border-slate-800">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            Menu
+          </span>
           <motion.button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded"
@@ -41,6 +53,7 @@ const Sidebar = ({
           </motion.button>
         </div>
 
+        {/* Navigation Items */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = currentPage === item.id;
@@ -60,11 +73,11 @@ const Sidebar = ({
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <span className="text-lg">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="text-lg flex-shrink-0">{item.icon}</span>
+                <span className="truncate">{item.label}</span>
                 {isActive && (
                   <motion.span
-                    className="ml-auto text-blue-600 dark:text-blue-400"
+                    className="ml-auto text-blue-600 dark:text-blue-400 flex-shrink-0"
                     initial={{ x: -10 }}
                     animate={{ x: 0 }}
                   >
@@ -76,14 +89,15 @@ const Sidebar = ({
           })}
         </nav>
 
+        {/* Logout Button */}
         <div className="p-4 border-t border-gray-200 dark:border-slate-800">
           <motion.button
             className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all"
             whileHover={{ x: 4 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="text-lg">🚪</span>
-            Logout
+            <span className="text-lg flex-shrink-0">🚪</span>
+            <span className="truncate">Logout</span>
           </motion.button>
         </div>
       </motion.aside>

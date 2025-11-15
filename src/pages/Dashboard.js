@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LineChart, Line, PieChart, Pie, Cell,
@@ -13,158 +13,287 @@ import {
 } from "lucide-react";
 import { dashbaordData } from "../data/mockData";
 
+// Reusable Components
+const Card = ({ children, className = "", hover = false }) => (
+  <div
+    className={`bg-white dark:bg-slate-800 rounded-xl shadow-md ${
+      hover ? "hover:shadow-lg" : ""
+    } transition-shadow ${className}`}
+  >
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children, className = "" }) => (
+  <div className={`px-6 py-4 border-b border-gray-200 dark:border-slate-700 ${className}`}>
+    {children}
+  </div>
+);
+
+const CardContent = ({ children, className = "" }) => (
+  <div className={`p-6 ${className}`}>{children}</div>
+);
+
+const Badge = ({ children, variant = "default" }) => {
+  const variants = {
+    default: "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300",
+    success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
+    warning: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+    danger: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+  };
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[variant]}`}>
+      {children}
+    </span>
+  );
+};
+
+const Popup = ({ title, onClose, children }) => (
+  <AnimatePresence>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </button>
+        </div>
+        <div className="p-6">{children}</div>
+      </motion.div>
+    </motion.div>
+  </AnimatePresence>
+);
+
+// Summary Card Component
+const SummaryCard = ({ title, value, subtitle, Icon, color, trend }) => (
+  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+    <Card hover className="relative overflow-hidden cursor-pointer h-full">
+      <div className={`absolute top-0 right-0 w-20 h-20 opacity-10 ${color} rounded-full -mr-6 -mt-6`}></div>
+      <CardContent className="flex flex-col gap-4 h-full">
+        <div className="flex items-start gap-3">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${color} shadow-lg flex-shrink-0`}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              {typeof value === "number" ? `${value.toLocaleString()}` : value}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+          </div>
+        </div>
+        {trend && (
+          <div className="flex justify-end">
+            <Badge variant={trend.includes("↑") ? "success" : "danger"}>{trend}</Badge>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
+// Quick Action Card
+const QuickActionCard = ({ title, icon: Icon, color, id, onClick }) => (
+  <motion.button
+    whileHover={{ scale: 1.05, y: -2 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={() => onClick(id)}
+    className={`p-4 rounded-xl bg-gradient-to-br ${color} text-white shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center min-h-[100px] group`}
+  >
+    <Icon className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" />
+    <span className="text-sm font-semibold text-center">{title}</span>
+  </motion.button>
+);
+
+// Alert Item
+const AlertItem = ({ alert, idx }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay: idx * 0.1 }}
+    className="flex items-center justify-between p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 hover:shadow-md transition-shadow"
+  >
+    <div className="flex items-center space-x-3 min-w-0">
+      <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+      <div className="min-w-0">
+        <p className="font-medium text-gray-900 dark:text-white truncate">{alert.message}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Amount: ${alert.amount}</p>
+      </div>
+    </div>
+    <button className="px-3 py-1 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex-shrink-0 ml-2">
+      Review
+    </button>
+  </motion.div>
+);
+
+// Transaction Item
+const TransactionItem = ({ txn, idx }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay: idx * 0.05 }}
+    className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group"
+  >
+    <div className="flex items-center space-x-3 min-w-0 flex-1">
+      <div className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 group-hover:scale-110 transition-transform flex-shrink-0">
+        <txn.Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-gray-900 dark:text-white truncate">{txn.description}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {txn.category} • {txn.date}
+        </p>
+      </div>
+    </div>
+    <span className={`font-semibold flex-shrink-0 ml-4 ${txn.amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+      {txn.amount >= 0 ? "+" : "-"}${Math.abs(txn.amount).toLocaleString()}
+    </span>
+  </motion.div>
+);
+
+// Form Components
+const FormInput = ({ placeholder, type = "text", className = "" }) => (
+  <input
+    type={type}
+    placeholder={placeholder}
+    className={`w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${className}`}
+  />
+);
+
+const FormSelect = ({ children, className = "" }) => (
+  <select className={`w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${className}`}>
+    {children}
+  </select>
+);
+
+const FormButton = ({ children, gradient }) => (
+  <button className={`w-full px-4 py-2 bg-gradient-to-r ${gradient} text-white rounded-lg font-semibold hover:shadow-lg transition-shadow`}>
+    {children}
+  </button>
+);
+
+// Popup Forms
+const PopupContent = {
+  send: (
+    <div className="space-y-4">
+      <FormInput placeholder="Recipient Name" />
+      <FormInput placeholder="Amount" type="number" />
+      <FormButton gradient="from-green-500 to-emerald-600">Send Now</FormButton>
+    </div>
+  ),
+  bills: (
+    <div className="space-y-4">
+      <FormSelect>
+        <option>Select Bill Provider</option>
+        <option>Electricity</option>
+        <option>Water</option>
+        <option>Internet</option>
+        <option>Phone</option>
+      </FormSelect>
+      <FormInput placeholder="Amount" type="number" />
+      <FormButton gradient="from-blue-500 to-cyan-600">Pay Bill</FormButton>
+    </div>
+  ),
+  invest: (
+    <div className="space-y-4">
+      <FormSelect>
+        <option>Select Investment Type</option>
+        <option>Stocks</option>
+        <option>Bonds</option>
+        <option>Mutual Funds</option>
+        <option>Crypto</option>
+      </FormSelect>
+      <FormInput placeholder="Investment Amount" type="number" />
+      <FormButton gradient="from-purple-500 to-indigo-600">Invest Now</FormButton>
+    </div>
+  ),
+  loan: (
+    <div className="space-y-4">
+      <FormInput placeholder="Loan Amount" type="number" />
+      <FormSelect>
+        <option>Loan Duration</option>
+        <option>6 months</option>
+        <option>1 year</option>
+        <option>2 years</option>
+        <option>5 years</option>
+      </FormSelect>
+      <FormButton gradient="from-orange-500 to-red-500">Apply for Loan</FormButton>
+    </div>
+  ),
+};
+
+// Main Dashboard Component
 const Dashboard = () => {
   const [timeRange, setTimeRange] = useState("monthly");
   const [showDetailedView, setShowDetailedView] = useState(false);
   const [activePopup, setActivePopup] = useState(null);
 
-  const Card = ({ children, className = "", hover = false }) => (
-    <div
-      className={`bg-white dark:bg-slate-800 rounded-xl shadow-md ${
-        hover ? "hover:shadow-lg" : ""
-      } transition-shadow ${className}`}
-    >
-      {children}
-    </div>
-  );
+  const pieData = useMemo(() => [
+    { name: "Food & Dining", value: 800, color: "#EF4444" },
+    { name: "Transport", value: 600, color: "#F59E0B" },
+    { name: "Entertainment", value: 400, color: "#8B5CF6" },
+    { name: "Bills & Utilities", value: 1200, color: "#3B82F6" },
+    { name: "Shopping", value: 500, color: "#EC4899" },
+    { name: "Other", value: 300, color: "#10B981" },
+  ], []);
 
-  const CardHeader = ({ children }) => (
-    <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-      {children}
-    </div>
-  );
+  const transactions = useMemo(() => [
+    { id: 1, description: "Spotify Subscription", category: "Entertainment", date: "Today", amount: -12.99, Icon: Music },
+    { id: 2, description: "Salary Deposit", category: "Income", date: "Yesterday", amount: 5000, Icon: Briefcase },
+    { id: 3, description: "Amazon Purchase", category: "Shopping", date: "2 days ago", amount: -127.5, Icon: Package },
+  ], []);
 
-  const CardContent = ({ children }) => (
-    <div className="p-6">{children}</div>
-  );
-
-  const Badge = ({ children, variant = "default" }) => {
-    const variants = {
-      default: "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300",
-      success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
-      warning: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-      danger: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
-    };
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[variant]}`}>
-        {children}
-      </span>
-    );
-  };
-
-  const SummaryCard = ({ title, value, subtitle, Icon, color, trend }) => (
-    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Card hover className="relative overflow-hidden cursor-pointer">
-        <div className={`absolute top-0 right-0 w-20 h-20 opacity-10 ${color} rounded-full -mr-6 -mt-6`}></div>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-3">
-              <div className={`p-3 rounded-xl bg-gradient-to-br ${color} shadow-lg flex-shrink-0`}>
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {title}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1 break-words">
-                  {typeof value === "number" ? `${value.toLocaleString()}` : value}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {subtitle}
-                </p>
-              </div>
-            </div>
-            {trend && (
-              <div className="flex justify-end">
-                <Badge variant={trend.includes("↑") ? "success" : "danger"}>
-                  {trend}
-                </Badge>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-
-  const Popup = ({ title, onClose, children }) => (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      >
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full"
-        >
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
-          </div>
-          <div className="p-6">{children}</div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-
-  const QuickActionCard = ({ title, icon: Icon, color, id }) => (
-    <motion.button
-      whileHover={{ scale: 1.05, y: -2 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => setActivePopup(id)}
-      className={`p-4 rounded-xl bg-gradient-to-br ${color} text-white shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center min-h-[100px]`}
-    >
-      <Icon className="w-6 h-6 mb-2" />
-      <span className="text-sm font-semibold">{title}</span>
-    </motion.button>
-  );
+  const handlePopupOpen = (id) => setActivePopup(id);
+  const handlePopupClose = () => setActivePopup(null);
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+    <div className="space-y-6 p-4 sm:p-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Welcome back! Here's your financial overview.
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowDetailedView(!showDetailedView)}
-              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
-            >
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </motion.button>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Welcome back! Here's your financial overview.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowDetailedView(!showDetailedView)}
+            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </motion.button>
         </div>
       </motion.div>
 
@@ -183,7 +312,11 @@ const Dashboard = () => {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {dashbaordData.quickActions.map((action) => (
-                <QuickActionCard key={action.id} {...action} />
+                <QuickActionCard
+                  key={action.id}
+                  {...action}
+                  onClick={handlePopupOpen}
+                />
               ))}
             </div>
           </CardContent>
@@ -253,7 +386,7 @@ const Dashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
                 <XAxis dataKey="name" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
-                <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px' }} />
                 <Area type="monotone" dataKey="income" stroke="#10B981" fillOpacity={1} fill="url(#incomeGradient)" />
                 <Area type="monotone" dataKey="expenses" stroke="#EF4444" fillOpacity={1} fill="url(#expensesGradient)" />
               </AreaChart>
@@ -271,14 +404,7 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={[
-                    { name: "Food & Dining", value: 800, color: "#EF4444" },
-                    { name: "Transport", value: 600, color: "#F59E0B" },
-                    { name: "Entertainment", value: 400, color: "#8B5CF6" },
-                    { name: "Bills & Utilities", value: 1200, color: "#3B82F6" },
-                    { name: "Shopping", value: 500, color: "#EC4899" },
-                    { name: "Other", value: 300, color: "#10B981" },
-                  ]}
+                  data={pieData}
                   cx="50%"
                   cy="50%"
                   innerRadius={showDetailedView ? 40 : 60}
@@ -286,14 +412,7 @@ const Dashboard = () => {
                   paddingAngle={2}
                   dataKey="value"
                 >
-                  {[
-                    { name: "Food & Dining", value: 800, color: "#EF4444" },
-                    { name: "Transport", value: 600, color: "#F59E0B" },
-                    { name: "Entertainment", value: 400, color: "#8B5CF6" },
-                    { name: "Bills & Utilities", value: 1200, color: "#3B82F6" },
-                    { name: "Shopping", value: 500, color: "#EC4899" },
-                    { name: "Other", value: 300, color: "#10B981" },
-                  ].map((entry, index) => (
+                  {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -304,7 +423,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Alerts and Recent Transactions */}
+      {/* Alerts and Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -315,33 +434,10 @@ const Dashboard = () => {
               <Badge variant="warning">{dashbaordData.spendingAlerts.length} Alerts</Badge>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {dashbaordData.spendingAlerts.map((alert, idx) => (
-                <motion.div
-                  key={alert.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex items-center justify-between p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20"
-                >
-                  <div className="flex items-center space-x-3">
-                    <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {alert.message}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Amount: ${alert.amount}
-                      </p>
-                    </div>
-                  </div>
-                  <button className="px-3 py-1 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors">
-                    Review
-                  </button>
-                </motion.div>
-              ))}
-            </div>
+          <CardContent className="space-y-3 max-h-96 overflow-y-auto">
+            {dashbaordData.spendingAlerts.map((alert, idx) => (
+              <AlertItem key={alert.id} alert={alert} idx={idx} />
+            ))}
           </CardContent>
         </Card>
 
@@ -351,42 +447,13 @@ const Dashboard = () => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Recent Transactions
               </h3>
-              <Badge variant="success">5 Transactions</Badge>
+              <Badge variant="success">{transactions.length} Transactions</Badge>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {[
-                { id: 1, description: "Spotify Subscription", category: "Entertainment", date: "Today", amount: -12.99, Icon: Music, status: "Completed" },
-                { id: 2, description: "Salary Deposit", category: "Income", date: "Yesterday", amount: 5000, Icon: Briefcase, status: "Completed" },
-                { id: 3, description: "Amazon Purchase", category: "Shopping", date: "2 days ago", amount: -127.5, Icon: Package, status: "Completed" },
-              ].map((txn, idx) => (
-                <motion.div
-                  key={txn.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 group-hover:scale-110 transition-transform">
-                      <txn.Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {txn.description}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {txn.category} • {txn.date}
-                      </p>
-                    </div>
-                  </div>
-                  <span className={`font-semibold ${txn.amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
-                    {txn.amount >= 0 ? "+" : "-"}${Math.abs(txn.amount).toLocaleString()}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+          <CardContent className="space-y-3">
+            {transactions.map((txn, idx) => (
+              <TransactionItem key={txn.id} txn={txn} idx={idx} />
+            ))}
           </CardContent>
         </Card>
       </div>
@@ -394,85 +461,23 @@ const Dashboard = () => {
       {/* Popups */}
       <AnimatePresence>
         {activePopup === 1 && (
-          <Popup title="Send Money" onClose={() => setActivePopup(null)}>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Recipient Name"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-              <input
-                type="number"
-                placeholder="Amount"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-              <button className="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow">
-                Send Now
-              </button>
-            </div>
+          <Popup title="Send Money" onClose={handlePopupClose}>
+            {PopupContent.send}
           </Popup>
         )}
         {activePopup === 2 && (
-          <Popup title="Pay Bills" onClose={() => setActivePopup(null)}>
-            <div className="space-y-4">
-              <select className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option>Select Bill Provider</option>
-                <option>Electricity</option>
-                <option>Water</option>
-                <option>Internet</option>
-                <option>Phone</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Amount"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <button className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow">
-                Pay Bill
-              </button>
-            </div>
+          <Popup title="Pay Bills" onClose={handlePopupClose}>
+            {PopupContent.bills}
           </Popup>
         )}
         {activePopup === 3 && (
-          <Popup title="Invest" onClose={() => setActivePopup(null)}>
-            <div className="space-y-4">
-              <select className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                <option>Select Investment Type</option>
-                <option>Stocks</option>
-                <option>Bonds</option>
-                <option>Mutual Funds</option>
-                <option>Crypto</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Investment Amount"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              <button className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow">
-                Invest Now
-              </button>
-            </div>
+          <Popup title="Invest" onClose={handlePopupClose}>
+            {PopupContent.invest}
           </Popup>
         )}
         {activePopup === 4 && (
-          <Popup title="Apply for Loan" onClose={() => setActivePopup(null)}>
-            <div className="space-y-4">
-              <input
-                type="number"
-                placeholder="Loan Amount"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-              <select className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <option>Loan Duration</option>
-                <option>6 months</option>
-                <option>1 year</option>
-                <option>2 years</option>
-                <option>5 years</option>
-              </select>
-              <button className="w-full px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow">
-                Apply for Loan
-              </button>
-            </div>
+          <Popup title="Apply for Loan" onClose={handlePopupClose}>
+            {PopupContent.loan}
           </Popup>
         )}
       </AnimatePresence>

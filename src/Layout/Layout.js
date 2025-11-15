@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
 const Layout = ({ children, currentPage, setCurrentPage, user }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on large screens
   const [isMobile, setIsMobile] = useState(false);
 
   const navItems = [
@@ -16,7 +16,13 @@ const Layout = ({ children, currentPage, setCurrentPage, user }) => {
   ];
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      // Auto-close sidebar on mobile, keep open on desktop
+      if (mobile) setSidebarOpen(false);
+      else setSidebarOpen(true);
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
