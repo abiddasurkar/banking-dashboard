@@ -1,27 +1,14 @@
+// Sidebar.jsx
 import React from "react";
 import { motion } from "framer-motion";
 
-const Sidebar = ({ navigation, currentPage, setCurrentPage, isOpen, isMobile, closeSidebar }) => {
-
+const Sidebar = ({ navigation, currentPage, setCurrentPage, isOpen, isMobile, toggleSidebar, closeSidebar }) => {
   return (
     <>
-      {/* Mobile toggle button */}
-      {isMobile && (
-        <div className="lg:hidden fixed top-20 left-4 z-50">
-          <motion.button
-            onClick={isOpen ? closeSidebar : () => closeSidebar(true)}
-            className="p-2 rounded-lg bg-white dark:bg-slate-800 shadow-lg text-gray-900 dark:text-white border border-gray-200 dark:border-slate-700"
-            whileTap={{ scale: 0.95 }}
-          >
-            {isOpen ? "✕" : "☰"}
-          </motion.button>
-        </div>
-      )}
-
-      {/* Backdrop for mobile */}
+      {/* Backdrop on Mobile */}
       {isMobile && isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={closeSidebar}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -29,12 +16,9 @@ const Sidebar = ({ navigation, currentPage, setCurrentPage, isOpen, isMobile, cl
         />
       )}
 
-      {/* Sidebar */}
       <motion.div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-800 shadow-lg lg:shadow-none lg:translate-x-0 lg:static`}
-        animate={{
-          x: isMobile ? (isOpen ? 0 : -256) : 0
-        }}
+        className="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-800 shadow-lg lg:static lg:shadow-none"
+        animate={{ x: isMobile ? (isOpen ? 0 : -260) : 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <nav className="mt-8 px-3 space-y-2">
@@ -45,16 +29,16 @@ const Sidebar = ({ navigation, currentPage, setCurrentPage, isOpen, isMobile, cl
                 setCurrentPage(item.id);
                 if (isMobile) closeSidebar();
               }}
-              className={`w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center px-4 py-3 rounded-lg transition-all ${
                 currentPage === item.id
                   ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-semibold"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
               }`}
               whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.97 }}
             >
               <span className="text-lg mr-3">{item.icon}</span>
-              <span>{item.name}</span>
+              {item.name}
             </motion.button>
           ))}
         </nav>
