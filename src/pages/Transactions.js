@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import { transactionsPageData } from "../data/mockData";
-import { Download, Search, Filter, ChevronDown } from "lucide-react";
+import { Download, Search, ChevronDown } from "lucide-react";
 
 // Stat Card Component
 const StatCard = ({ label, value, color, isLoading = false }) => (

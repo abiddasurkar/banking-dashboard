@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Palette, Bell, Shield, Globe, Moon, Sun,
-  FileText, Bug, BookOpen, ChevronRight
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { settingsPageData } from "../data/mockData";
 
 const Settings = () => {

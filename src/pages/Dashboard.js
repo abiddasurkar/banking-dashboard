@@ -1,15 +1,14 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, AreaChart, Area, BarChart, Bar
+  PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, AreaChart, Area,
 } from "recharts";
 import {
-  Send, FileText, TrendingUp, Landmark,
-  AlertCircle, CheckCircle, Music, Briefcase,
-  Package, ChevronRight, Settings, Bell,
-  Wallet, CreditCard, PiggyBank, BarChart3, X
+  AlertCircle, Music, Briefcase,
+  Package,  Settings,Wallet, 
+  CreditCard, PiggyBank, BarChart3, X
 } from "lucide-react";
 import { dashbaordData } from "../data/mockData";
 

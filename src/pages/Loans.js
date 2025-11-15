@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import { loansData } from "../data/mockData";
-import { Plus, Calendar, TrendingUp, X, ArrowRight } from "lucide-react";
+import { Plus, Calendar, X, ArrowRight } from "lucide-react";
 
 // ============================================================================
 // UTILITY FUNCTIONS
