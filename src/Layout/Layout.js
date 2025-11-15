@@ -5,29 +5,26 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
 const Layout = ({ children, currentPage, setCurrentPage }) => {
-  // Mock User
   const [user] = useState({
     name: "Alex Johnson",
     role: "Premium Client",
     initials: "AJ",
   });
 
-  // Sidebar State
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const closeSidebar = () => setSidebarOpen(false);
 
-  // Detect Mobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Navigation
   const navigation = [
     { name: "Dashboard", id: "dashboard", icon: "📊" },
     { name: "Transactions", id: "transactions", icon: "💳" },
@@ -49,7 +46,6 @@ const Layout = ({ children, currentPage, setCurrentPage }) => {
           setCurrentPage={setCurrentPage}
           isOpen={sidebarOpen}
           isMobile={isMobile}
-          toggleSidebar={toggleSidebar}
           closeSidebar={closeSidebar}
         />
 

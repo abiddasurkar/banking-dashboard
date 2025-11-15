@@ -1,24 +1,37 @@
 // Sidebar.jsx
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-const Sidebar = ({ navigation, currentPage, setCurrentPage, isOpen, isMobile, toggleSidebar, closeSidebar }) => {
+const Sidebar = ({
+  navigation,
+  currentPage,
+  setCurrentPage,
+  isOpen,
+  isMobile,
+  closeSidebar
+}) => {
   return (
     <>
-      {/* Backdrop on Mobile */}
-      {isMobile && isOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={closeSidebar}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        />
-      )}
+      {/* Backdrop for Mobile */}
+      <AnimatePresence>
+        {isMobile && isOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={closeSidebar}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+        )}
+      </AnimatePresence>
 
+      {/* Sidebar */}
       <motion.div
-        className="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-800 shadow-lg lg:static lg:shadow-none"
-        animate={{ x: isMobile ? (isOpen ? 0 : -260) : 0 }}
+        className="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-800 shadow-lg 
+                   lg:static lg:shadow-none lg:translate-x-0"
+        animate={{
+          x: isMobile ? (isOpen ? 0 : -260) : 0,
+        }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <nav className="mt-8 px-3 space-y-2">
