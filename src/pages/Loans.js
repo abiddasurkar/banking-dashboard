@@ -403,11 +403,10 @@ const TabBar = ({ tabs, activeTab, setActiveTab }) => (
       <motion.button
         key={tab.id}
         onClick={() => setActiveTab(tab.id)}
-        className={`px-4 py-3 font-medium text-sm whitespace-nowrap transition-colors relative flex-shrink-0 ${
-          activeTab === tab.id
+        className={`px-4 py-3 font-medium text-sm whitespace-nowrap transition-colors relative flex-shrink-0 ${activeTab === tab.id
             ? "text-blue-600 dark:text-blue-400"
             : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-        }`}
+          }`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -450,7 +449,7 @@ const Loans = () => {
       avgProgress:
         loansData.active.length > 0
           ? loansData.active.reduce((sum, loan) => sum + loan.progress, 0) /
-            loansData.active.length
+          loansData.active.length
           : 0,
     };
   }, []);

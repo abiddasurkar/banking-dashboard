@@ -3,6 +3,16 @@ import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import ToggleSwitch from "../components/ui/ToggleSwitch";
+import {
+  User,
+  Lock,
+  Bell,
+  Settings,
+  Edit,
+  Save,
+  X,
+  ChevronRight,
+} from "lucide-react";
 
 // IMPORT ALL DATA FROM mockData.js
 import { profilePageData } from "../data/mockData";
@@ -40,34 +50,33 @@ const Profile = () => {
     setProfileData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const TabButton = ({ id, label, icon, isActive, onClick }) => (
+  const TabButton = ({ id, label, icon: Icon, isActive, onClick }) => (
     <motion.button
       onClick={() => onClick(id)}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all w-full text-left ${
-        isActive
-          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
-          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all w-full text-left ${isActive
+        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+        }`}
       whileHover={{ x: 4 }}
       whileTap={{ scale: 0.98 }}
     >
-      <span className="text-lg">{icon}</span>
+      <Icon className="w-5 h-5 flex-shrink-0" />
       <span>{label}</span>
 
       {isActive && (
-        <motion.span
-          className="ml-auto text-blue-600 dark:text-blue-400"
-          initial={{ x: -10 }}
-          animate={{ x: 0 }}
+        <motion.div
+          className="ml-auto flex-shrink-0"
+          initial={{ x: -10, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
         >
-          →
-        </motion.span>
+          <ChevronRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        </motion.div>
       )}
     </motion.button>
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6">
       {/* HEADER */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -83,25 +92,34 @@ const Profile = () => {
           {!isEditing ? (
             <motion.button
               onClick={() => setIsEditing(true)}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              ✏️ Edit Profile
+              <Edit className="w-4 h-4" />
+              <span className="hidden sm:inline">Edit Profile</span>
+              <span className="sm:hidden">Edit</span>
             </motion.button>
           ) : (
             <div className="flex gap-3">
               <motion.button
                 onClick={handleCancel}
-                className="px-6 py-3 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg"
+                className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors flex items-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                Cancel
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">Cancel</span>
               </motion.button>
               <motion.button
                 onClick={handleSave}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                💾 Save Changes
+                <Save className="w-4 h-4" />
+                <span className="hidden sm:inline">Save Changes</span>
+                <span className="sm:hidden">Save</span>
               </motion.button>
             </div>
           )}
@@ -110,16 +128,15 @@ const Profile = () => {
 
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
         {/* SIDEBAR */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 h-fit">
           <CardContent className="p-6">
             <div className="space-y-2">
               {[
-                { id: "personal", label: "Personal Info", icon: "👤" },
-                { id: "security", label: "Security", icon: "🔒" },
-                { id: "notifications", label: "Notifications", icon: "🔔" },
-                { id: "preferences", label: "Preferences", icon: "⚙️" },
+                { id: "personal", label: "Personal Info", icon: User },
+                { id: "security", label: "Security", icon: Lock },
+                { id: "notifications", label: "Notifications", icon: Bell },
+                { id: "preferences", label: "Preferences", icon: Settings },
               ].map((tab) => (
                 <TabButton
                   key={tab.id}
@@ -134,15 +151,14 @@ const Profile = () => {
 
         {/* MAIN CONTENT */}
         <div className="lg:col-span-3 space-y-6">
-          
           {/* PERSONAL TAB */}
           {activeTab === "personal" && (
             <>
               <Card>
                 <CardHeader>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     Personal Information
-                    <span className="ml-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                   </h3>
                 </CardHeader>
 
@@ -164,7 +180,7 @@ const Profile = () => {
                             type={field.type}
                             value={field.value}
                             onChange={(e) => handleChange(field.key, e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                           />
                         ) : (
                           <p className="text-gray-900 dark:text-white font-medium py-2 px-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
@@ -189,7 +205,7 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Avatar */}
                     <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg flex-shrink-0">
                         {profileData.name
                           .split(" ")
                           .map((n) => n[0])
@@ -210,7 +226,10 @@ const Profile = () => {
                     {/* Stats */}
                     <div className="space-y-3">
                       {accountStats.map((stat, idx) => (
-                        <div key={idx} className="flex justify-between items-center">
+                        <div
+                          key={idx}
+                          className="flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                        >
                           <span className="text-sm text-gray-600 dark:text-gray-400">
                             {stat.label}
                           </span>
@@ -230,19 +249,20 @@ const Profile = () => {
           {activeTab === "security" && (
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Lock className="w-5 h-5" />
                   Security Settings
                 </h3>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {securitySettings.map((setting, idx) => (
                     <motion.div
                       key={setting.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg"
+                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
                       <div>
                         <h4 className="font-semibold text-gray-900 dark:text-white">
@@ -252,7 +272,7 @@ const Profile = () => {
                           {setting.description}
                         </p>
                       </div>
-                      <ToggleSwitch value={setting.enabled} onChange={() => {}} />
+                      <ToggleSwitch value={setting.enabled} onChange={() => { }} />
                     </motion.div>
                   ))}
                 </div>
@@ -264,20 +284,21 @@ const Profile = () => {
           {activeTab === "notifications" && (
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Bell className="w-5 h-5" />
                   Notification Preferences
                 </h3>
               </CardHeader>
 
               <CardContent>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {notificationSettings.map((setting, idx) => (
                     <motion.div
                       key={setting.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg"
+                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
                       <div>
                         <h4 className="font-semibold text-gray-900 dark:text-white">
@@ -287,9 +308,62 @@ const Profile = () => {
                           {setting.description}
                         </p>
                       </div>
-                      <ToggleSwitch value={setting.enabled} onChange={() => {}} />
+                      <ToggleSwitch value={setting.enabled} onChange={() => { }} />
                     </motion.div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* PREFERENCES TAB */}
+          {activeTab === "preferences" && (
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Preferences
+                </h3>
+              </CardHeader>
+
+              <CardContent>
+                <div className="space-y-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        Theme Preference
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Choose your preferred color theme
+                      </p>
+                    </div>
+                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                      Currently set to: <span className="font-semibold">Auto (System)</span>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        Language
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Select your preferred language
+                      </p>
+                    </div>
+                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                      Currently set to: <span className="font-semibold">English (US)</span>
+                    </div>
+                  </motion.div>
                 </div>
               </CardContent>
             </Card>

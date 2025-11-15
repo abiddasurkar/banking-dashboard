@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sun, Moon, Type, Palette, BookOpen, Bug, FileText, Shield, Lock } from "lucide-react";
 import { settingsPageData } from "../data/mockData";
 
 const Settings = () => {
@@ -40,9 +40,8 @@ const Settings = () => {
   const ToggleSwitch = ({ value, onChange }) => (
     <motion.button
       onClick={() => onChange(!value)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        value ? "bg-blue-600" : "bg-gray-300 dark:bg-slate-600"
-      }`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? "bg-blue-600" : "bg-gray-300 dark:bg-slate-600"
+        }`}
       whileTap={{ scale: 0.95 }}
     >
       <motion.span
@@ -58,36 +57,37 @@ const Settings = () => {
     return (
       <motion.button
         onClick={() => onClick(section.id)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all w-full text-left ${
-          isActive
-            ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
-            : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-        }`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all w-full text-left ${isActive
+          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+          }`}
         whileHover={{ x: 4 }}
         whileTap={{ scale: 0.98 }}
       >
-        <Icon className="w-5 h-5" />
+        <Icon className="w-5 h-5 flex-shrink-0" />
         <span>{section.label}</span>
         {isActive && (
-          <motion.span
-            className="ml-auto text-blue-600 dark:text-blue-400"
-            initial={{ x: -10 }}
-            animate={{ x: 0 }}
+          <motion.div
+            className="ml-auto flex-shrink-0"
+            initial={{ x: -10, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
           >
-            <ChevronRight className="w-4 h-4" />
-          </motion.span>
+            <ChevronRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          </motion.div>
         )}
       </motion.button>
     );
   };
 
-  const SettingItem = ({ title, description, enabled, onChange, icon }) => (
+  const SettingItem = ({ title, description, enabled, onChange, icon: IconComponent }) => (
     <motion.div
       className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
       whileHover={{ scale: 1.01 }}
     >
       <div className="flex items-center space-x-4">
-        <div className="text-2xl">{icon}</div>
+        <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex-shrink-0">
+          <IconComponent className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        </div>
         <div>
           <h4 className="font-semibold text-gray-900 dark:text-white">
             {title}
@@ -102,7 +102,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+    <div className="space-y-6 p-4 sm:p-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -115,7 +115,7 @@ const Settings = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Navigation Sidebar */}
-        <Card className="lg:col-span-1 h-fit">
+        <Card className="lg:col-span-1 h-fit sticky top-20">
           <CardContent className="p-6">
             <div className="space-y-2">
               {settingsPageData.settingsSections.map((section) => (
@@ -137,7 +137,8 @@ const Settings = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Card>
                 <CardHeader>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Palette className="w-5 h-5" />
                     Appearance
                   </h3>
                 </CardHeader>
@@ -147,7 +148,7 @@ const Settings = () => {
                     description="Switch between light and dark themes"
                     enabled={isDark}
                     onChange={setIsDark}
-                    icon={isDark ? "🌙" : "☀️"}
+                    icon={isDark ? Moon : Sun}
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
@@ -155,9 +156,7 @@ const Settings = () => {
                       className="p-4 text-left border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                        🎯
-                      </div>
+                      <Type className="w-6 h-6 mb-2 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
                       <h4 className="font-semibold text-gray-900 dark:text-white">
                         Font Size
                       </h4>
@@ -170,9 +169,7 @@ const Settings = () => {
                       className="p-4 text-left border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                        🎨
-                      </div>
+                      <Palette className="w-6 h-6 mb-2 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
                       <h4 className="font-semibold text-gray-900 dark:text-white">
                         Color Theme
                       </h4>
@@ -221,7 +218,8 @@ const Settings = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Card>
                 <CardHeader>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
                     Privacy & Security
                   </h3>
                 </CardHeader>
@@ -260,7 +258,7 @@ const Settings = () => {
                     <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
                       Preferred Language
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                       {settingsPageData.languageOptions.map((lang) => (
                         <option key={lang.code} value={lang.code}>
                           {lang.name} ({lang.native})
@@ -273,7 +271,7 @@ const Settings = () => {
                     <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
                       Date Format
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                       <option value="mm/dd/yyyy">MM/DD/YYYY</option>
                       <option value="dd/mm/yyyy">DD/MM/YYYY</option>
                       <option value="yyyy-mm-dd">YYYY-MM-DD</option>
@@ -284,7 +282,7 @@ const Settings = () => {
                     <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
                       Time Zone
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                       <option value="est">Eastern Time (ET)</option>
                       <option value="cst">Central Time (CT)</option>
                       <option value="pst">Pacific Time (PT)</option>
@@ -307,7 +305,7 @@ const Settings = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                       EB
                     </div>
                     <div>
@@ -326,9 +324,7 @@ const Settings = () => {
                       className="p-4 text-left border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                        📖
-                      </div>
+                      <BookOpen className="w-6 h-6 mb-2 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
                       <h4 className="font-semibold text-gray-900 dark:text-white">
                         User Guide
                       </h4>
@@ -341,9 +337,7 @@ const Settings = () => {
                       className="p-4 text-left border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                        🐛
-                      </div>
+                      <Bug className="w-6 h-6 mb-2 text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform" />
                       <h4 className="font-semibold text-gray-900 dark:text-white">
                         Report Issue
                       </h4>
@@ -358,13 +352,16 @@ const Settings = () => {
                       Legal
                     </h4>
                     <div className="space-y-2 text-sm">
-                      <button className="text-blue-600 dark:text-blue-400 hover:underline block">
+                      <button className="text-blue-600 dark:text-blue-400 hover:underline block flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
                         Terms of Service
                       </button>
-                      <button className="text-blue-600 dark:text-blue-400 hover:underline block">
+                      <button className="text-blue-600 dark:text-blue-400 hover:underline block flex items-center gap-2">
+                        <Lock className="w-4 h-4" />
                         Privacy Policy
                       </button>
-                      <button className="text-blue-600 dark:text-blue-400 hover:underline block">
+                      <button className="text-blue-600 dark:text-blue-400 hover:underline block flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
                         License Information
                       </button>
                     </div>

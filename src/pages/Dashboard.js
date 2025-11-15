@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   AlertCircle, Music, Briefcase,
-  Package,  Settings,Wallet, 
+  Package, Settings, Wallet,
   CreditCard, PiggyBank, BarChart3, X
 } from "lucide-react";
 import { dashbaordData } from "../data/mockData";
@@ -15,9 +15,8 @@ import { dashbaordData } from "../data/mockData";
 // Reusable Components
 const Card = ({ children, className = "", hover = false }) => (
   <div
-    className={`bg-white dark:bg-slate-800 rounded-xl shadow-md ${
-      hover ? "hover:shadow-lg" : ""
-    } transition-shadow ${className}`}
+    className={`bg-white dark:bg-slate-800 rounded-xl shadow-md ${hover ? "hover:shadow-lg" : ""
+      } transition-shadow ${className}`}
   >
     {children}
   </div>
@@ -374,12 +373,12 @@ const Dashboard = () => {
               <AreaChart data={dashbaordData.chartData}>
                 <defs>
                   <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />

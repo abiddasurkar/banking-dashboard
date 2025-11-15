@@ -30,9 +30,9 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <Layout 
-        currentPage={currentPage} 
-        setCurrentPage={setCurrentPage} 
+      <Layout
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
         user={user}
       >
         {renderPage()}

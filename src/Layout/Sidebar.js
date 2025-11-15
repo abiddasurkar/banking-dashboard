@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { X, LogOut, ChevronRight } from "lucide-react";
 
 const Sidebar = ({
   isOpen,
@@ -45,10 +46,11 @@ const Sidebar = ({
           </span>
           <motion.button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
             whileTap={{ scale: 0.95 }}
+            aria-label="Close menu"
           >
-            ✕
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </motion.button>
         </div>
 
@@ -56,6 +58,7 @@ const Sidebar = ({
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = currentPage === item.id;
+            const IconComponent = item.icon;
 
             return (
               <motion.button
@@ -64,24 +67,23 @@ const Sidebar = ({
                   setCurrentPage(item.id);
                   if (isMobile) onClose();
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                  isActive
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${isActive
                     ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-                }`}
+                  }`}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <span className="text-lg flex-shrink-0">{item.icon}</span>
+                <IconComponent className="w-5 h-5 flex-shrink-0" />
                 <span className="truncate">{item.label}</span>
                 {isActive && (
-                  <motion.span
-                    className="ml-auto text-blue-600 dark:text-blue-400 flex-shrink-0"
-                    initial={{ x: -10 }}
-                    animate={{ x: 0 }}
+                  <motion.div
+                    className="ml-auto flex-shrink-0"
+                    initial={{ x: -10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
                   >
-                    →
-                  </motion.span>
+                    <ChevronRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </motion.div>
                 )}
               </motion.button>
             );
@@ -95,7 +97,7 @@ const Sidebar = ({
             whileHover={{ x: 4 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="text-lg flex-shrink-0">🚪</span>
+            <LogOut className="w-5 h-5 flex-shrink-0" />
             <span className="truncate">Logout</span>
           </motion.button>
         </div>

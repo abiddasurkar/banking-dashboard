@@ -61,16 +61,15 @@ const DropdownMenu = ({ label, options, selected, onSelect, multi = false }) => 
                     setOpen(false);
                   }
                 }}
-                className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                  multi ? "justify-start" : ""
-                }`}
+                className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${multi ? "justify-start" : ""
+                  }`}
                 whileHover={{ x: 4 }}
               >
                 {multi ? (
                   <input
                     type="checkbox"
                     checked={selected.includes(option.value)}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="w-4 h-4 rounded cursor-pointer accent-blue-600"
                   />
                 ) : null}
@@ -138,11 +137,10 @@ const TransactionRow = ({ txn, idx }) => {
         <Badge variant={statusVariant}>{txn.status}</Badge>
       </td>
       <td
-        className={`px-4 py-4 text-right font-semibold whitespace-nowrap ${
-          txn.amount >= 0
-            ? "text-emerald-600 dark:text-emerald-400"
-            : "text-red-600 dark:text-red-400"
-        }`}
+        className={`px-4 py-4 text-right font-semibold whitespace-nowrap ${txn.amount >= 0
+          ? "text-emerald-600 dark:text-emerald-400"
+          : "text-red-600 dark:text-red-400"
+          }`}
       >
         {txn.amount >= 0 ? "+" : "-"}${Math.abs(txn.amount).toLocaleString()}
       </td>

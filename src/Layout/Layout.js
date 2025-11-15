@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  CreditCard,
+  TrendingUp,
+  User,
+  Settings,
+} from "lucide-react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
@@ -8,11 +15,11 @@ const Layout = ({ children, currentPage, setCurrentPage, user }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "transactions", label: "Transactions", icon: "💳" },
-    { id: "loans", label: "Loans", icon: "📈" },
-    { id: "profile", label: "Profile", icon: "👤" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "transactions", label: "Transactions", icon: CreditCard },
+    { id: "loans", label: "Loans", icon: TrendingUp },
+    { id: "profile", label: "Profile", icon: User },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   useEffect(() => {
