@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Layout from "./Layout/Layout";
+import Layout from "./layout/Layout";
 
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
@@ -8,33 +8,35 @@ import Loans from "./pages/Loans";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 
-const App = () => {
+export default function App() {
   const [currentPage, setCurrentPage] = useState("dashboard");
 
+  const user = {
+    name: "Alex Johnson",
+    role: "Premium Client",
+    initials: "AJ",
+  };
+
   const renderPage = () => {
-    switch (currentPage) {
-      case "dashboard":
-        return <Dashboard />;
-      case "transactions":
-        return <Transactions />;
-      case "loans":
-        return <Loans />;
-      case "profile":
-        return <Profile />;
-      case "settings":
-        return <Settings />;
-      default:
-        return <Dashboard />;
-    }
+    const pages = {
+      dashboard: <Dashboard />,
+      transactions: <Transactions />,
+      loans: <Loans />,
+      profile: <Profile />,
+      settings: <Settings />,
+    };
+    return pages[currentPage] || pages.dashboard;
   };
 
   return (
     <ThemeProvider>
-      <Layout currentPage={currentPage} setCurrentPage={setCurrentPage}>
+      <Layout 
+        currentPage={currentPage} 
+        setCurrentPage={setCurrentPage} 
+        user={user}
+      >
         {renderPage()}
       </Layout>
     </ThemeProvider>
   );
-};
-
-export default App;
+}

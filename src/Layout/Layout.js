@@ -1,63 +1,50 @@
-// Layout.jsx
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
-const Layout = ({ children, currentPage, setCurrentPage }) => {
-  const [user] = useState({
-    name: "Alex Johnson",
-    role: "Premium Client",
-    initials: "AJ",
-  });
-
-  const [isMobile, setIsMobile] = useState(false);
+const Layout = ({ children, currentPage, setCurrentPage, user }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const closeSidebar = () => setSidebarOpen(false);
+  const navItems = [
+    { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "transactions", label: "Transactions", icon: "💳" },
+    { id: "loans", label: "Loans", icon: "📈" },
+    { id: "profile", label: "Profile", icon: "👤" },
+    { id: "settings", label: "Settings", icon: "⚙️" },
+  ];
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const navigation = [
-    { name: "Dashboard", id: "dashboard", icon: "📊" },
-    { name: "Transactions", id: "transactions", icon: "💳" },
-    { name: "Loans", id: "loans", icon: "📈" },
-    { name: "Profile", id: "profile", icon: "👤" },
-    { name: "Settings", id: "settings", icon: "⚙️" },
-  ];
-
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900 transition-colors duration-300 overflow-hidden">
-
-      <Navbar user={user} toggleSidebar={toggleSidebar} />
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-950 overflow-hidden">
+      <Navbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} user={user} />
 
       <div className="flex flex-1 overflow-hidden">
-
         <Sidebar
-          navigation={navigation}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          isOpen={sidebarOpen}
           isMobile={isMobile}
-          closeSidebar={closeSidebar}
+          navItems={navItems}
         />
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 relative">
+        <main className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPage}
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -25 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="min-h-full"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="p-6 lg:p-8"
             >
               {children}
             </motion.div>
