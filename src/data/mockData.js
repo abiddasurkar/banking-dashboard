@@ -164,7 +164,7 @@ export const loansData = {
 // ---------------------------------------------------
 export const profilePageData = {
   profile: {
-    name: "Alex Johnson",
+    name: "Abid Dasurkar",
     email: "alex.johnson@email.com",
     phone: "+1 (555) 123-4567",
     memberSince: "Jan 2022",

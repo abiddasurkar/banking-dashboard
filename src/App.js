@@ -12,9 +12,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("dashboard");
 
   const user = {
-    name: "Alex Johnson",
+    name: "Abid Dasurkar",
     role: "Premium Client",
-    initials: "AJ",
+    initials: "AD",
   };
 
   const renderPage = () => {

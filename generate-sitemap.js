@@ -27,7 +27,7 @@ async function generateSitemap() {
 
     stream.end();
 
-    await streamToPromise(writeStream);
+    await streamToPromise(stream);
     console.log('✅ sitemap.xml generated successfully at public/sitemap.xml');
   } catch (error) {
     console.error('❌ Error generating sitemap:', error);
